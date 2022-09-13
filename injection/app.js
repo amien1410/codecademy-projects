@@ -20,6 +20,51 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname + "/index.html"));
 });
 
+// Data Sanitization
+app.post('/email', 
+  (req, res) => {
+    const response = {
+      normalizedEmail: validator.normalizeEmail(req.body.emailForm) // Normalize email here
+    }
+
+    res.json({message: response})
+});
+
+app.post('/date', 
+  (req, res) => {
+    const response = {
+      sanitizedDate: validator.toDate(req.body.dateForm)// Sanitize date here 
+    }
+
+    res.json({message: response})
+});
+
+app.post('/escape', 
+  (req, res) => {
+    const response = {
+      escapedValue: validator.escape(req.body.escapeForm)// Escape form values here 
+    }
+
+    res.json({message: response})
+});
+
+// Prepared Statements
+app.post("/info", async (req, res) => {
+
+  // Change the query to use a placeholder using array syntax
+  db.all(
+    `SELECT * FROM Employee WHERE LastName = ?`,[req.body.lastName], (err, rows) => {
+      if (rows) {
+        res.status(200);
+        res.json(rows);
+      } else {
+        res.status(200);
+        res.json({ message: "No employees" });
+      }
+    }
+  );
+});
+
 app.post("/info", async (req, res) => {
 
   // Change the query to use named placeholders
